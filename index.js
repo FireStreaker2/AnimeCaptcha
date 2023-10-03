@@ -16,7 +16,8 @@ const text = document.createElement("p");
 text.textContent = "I'm not a robot";
 
 const image = document.createElement("img");
-image.src = "https://i1.sndcdn.com/artworks-YUSh7sS3FMSdCFOl-mOk6Pg-t500x500.jpg";
+image.src =
+	"https://i1.sndcdn.com/artworks-YUSh7sS3FMSdCFOl-mOk6Pg-t500x500.jpg";
 image.style.width = "3rem";
 image.style.height = "3rem";
 
@@ -35,7 +36,7 @@ titleContainer.style.height = "30%";
 titleContainer.style.display = "flex";
 titleContainer.style.flexDirection = "row";
 
-const title = document.createElement("p");
+const titleText = document.createElement("p");
 
 const imageContainer = document.createElement("div");
 imageContainer.style.width = "100%";
@@ -48,40 +49,69 @@ const button = document.createElement("button");
 button.style.width = "2rem";
 button.style.height = "2rem";
 
+const append = (url) => {
+	const image = document.createElement("img");
+	image.style.width = "100%";
+	image.style.height = "auto";
+	image.src = url;
+
+	const container = document.createElement("a");
+	container.style.overflow = "hidden";
+	container.style.display = "flex";
+	container.style.width = "6rem";
+	container.style.height = "6rem";
+	container.appendChild(image);
+
+	imageContainer.appendChild(container);
+};
+
 button.addEventListener("click", () => {
 	captchaBody.style.display == "none"
 		? (captchaBody.style.display = "flex")
 		: (captchaBody.style.display = "none");
 
 	if (captchaBody.style.display == "none") {
+		imageContainer.innerHTML = "";
 		return;
 	}
 
-	const indicators = ["felix_argyle", "hololive"];
+	const indicators = ["felix_argyle", "hoshino_ruby", "hoshino_ai"];
 	let images = [];
 
-	const indicator = indicators[Math.floor(Math.random() * indicators.length)];
+	const primaryIndicator =
+		indicators[Math.floor(Math.random() * indicators.length)];
+	let secondaryIndicator =
+		indicators[Math.floor(Math.random() * indicators.length)];
 
-	for (let i = 0; i < 9; i++) {
-		fetch(`https://femboyfinder.firestreaker2.gq/api/${indicator}`)
+	while (secondaryIndicator == primaryIndicator) {
+		secondaryIndicator =
+			indicators[Math.floor(Math.random() * indicators.length)];
+	}
+
+	title = primaryIndicator.replace("_", " ");
+	titleText.textContent = `Click all images containing ${title}.`;
+
+	const amount = Math.floor(Math.random() * 9);
+
+	for (let i = 0; i < amount; i++) {
+		fetch(`https://femboyfinder.firestreaker2.gq/api/${primaryIndicator}`)
 			.then((response) => response.json())
 			.then((data) => {
 				images.push(data.URL);
-				console.log(data.URL);
+				append(data.URL);
+			})
+			.catch((error) => {
+				captchaBody.style.display = "none";
+				console.error(`[ERROR] ${error}`);
+			});
+	}
 
-				const image = document.createElement("img");
-				image.style.width = "100%";
-				image.style.height = "auto";
-				image.src = data.URL;
-
-				const container = document.createElement("a");
-				container.style.overflow = "hidden";
-				container.style.display = "flex";
-				container.style.width = "6rem";
-				container.style.height = "6rem";
-				container.appendChild(image);
-
-				imageContainer.appendChild(container);
+	for (let i = 0; i < 9 - amount; i++) {
+		fetch(`https://femboyfinder.firestreaker2.gq/api/${secondaryIndicator}`)
+			.then((response) => response.json())
+			.then((data) => {
+				images.push(data.URL);
+				append(data.URL);
 			})
 			.catch((error) => {
 				captchaBody.style.display = "none";
@@ -90,7 +120,7 @@ button.addEventListener("click", () => {
 	}
 });
 
-titleContainer.appendChild(title);
+titleContainer.appendChild(titleText);
 captchaBody.appendChild(titleContainer);
 captchaBody.appendChild(imageContainer);
 body.appendChild(button);
