@@ -11,6 +11,7 @@ body.style.fontFamily = "Arial";
 body.style.position = "absolute";
 body.style.left = "50%";
 body.style.top = "50%";
+//
 
 const text = document.createElement("p");
 text.textContent = "I'm not a robot";
@@ -37,6 +38,11 @@ titleContainer.style.display = "flex";
 titleContainer.style.flexDirection = "row";
 
 const titleText = document.createElement("p");
+titleText.style.marginLeft = "1rem";
+
+const exampleImage = document.createElement("img");
+exampleImage.style.width = "5rem";
+exampleImage.style.height = "5rem";
 
 const imageContainer = document.createElement("div");
 imageContainer.style.width = "100%";
@@ -44,6 +50,8 @@ imageContainer.style.height = "70%";
 imageContainer.style.display = "flex";
 imageContainer.style.flexDirection = "row";
 imageContainer.style.flexWrap = "wrap";
+imageContainer.style.alignContent = "flex-start";
+imageContainer.style.justifyContent = "center";
 
 const button = document.createElement("button");
 button.style.width = "2rem";
@@ -93,12 +101,13 @@ button.addEventListener("click", () => {
 
 	const amount = Math.floor(Math.random() * 9);
 
-	for (let i = 0; i < amount; i++) {
+	for (let i = 0; i < amount + 1; i++) {
 		fetch(`https://femboyfinder.firestreaker2.gq/api/${primaryIndicator}`)
 			.then((response) => response.json())
 			.then((data) => {
 				images.push(data.URL);
-				append(data.URL);
+
+				i === amount ? (exampleImage.src = data.URL) : append(data.URL);
 			})
 			.catch((error) => {
 				captchaBody.style.display = "none";
@@ -121,6 +130,7 @@ button.addEventListener("click", () => {
 });
 
 titleContainer.appendChild(titleText);
+titleContainer.appendChild(exampleImage);
 captchaBody.appendChild(titleContainer);
 captchaBody.appendChild(imageContainer);
 body.appendChild(button);
