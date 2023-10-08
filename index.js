@@ -13,6 +13,7 @@ body.style.left = "50%";
 body.style.top = "50%";
 //
 
+let finished = false;
 let selected = [];
 let correctImages = [];
 
@@ -36,7 +37,7 @@ captchaBody.style.flexDirection = "column";
 
 const titleContainer = document.createElement("div");
 titleContainer.style.width = "100%";
-titleContainer.style.height = "30%";
+titleContainer.style.height = "20%";
 titleContainer.style.display = "flex";
 titleContainer.style.flexDirection = "row";
 
@@ -46,10 +47,11 @@ titleText.style.marginLeft = "1rem";
 const exampleImage = document.createElement("img");
 exampleImage.style.width = "5rem";
 exampleImage.style.height = "5rem";
+exampleImage.style.margin = "0.5rem";
 
 const imageContainer = document.createElement("div");
 imageContainer.style.width = "100%";
-imageContainer.style.height = "70%";
+imageContainer.style.height = "80%";
 imageContainer.style.display = "flex";
 imageContainer.style.flexDirection = "row";
 imageContainer.style.flexWrap = "wrap";
@@ -59,6 +61,7 @@ imageContainer.style.justifyContent = "center";
 const button = document.createElement("button");
 button.style.width = "2rem";
 button.style.height = "2rem";
+button.style.cursor = "pointer";
 
 const append = (url, type) => {
 	const image = document.createElement("img");
@@ -71,6 +74,7 @@ const append = (url, type) => {
 	container.style.display = "flex";
 	container.style.width = "6rem";
 	container.style.height = "6rem";
+	container.style.margin = "0.3rem";
 	container.style.cursor = "pointer";
 	container.setAttribute("waifu-clicked", "false");
 	container.appendChild(image);
@@ -82,9 +86,11 @@ const append = (url, type) => {
 			if (container.getAttribute("waifu-clicked") === "false") {
 				selected.push(data);
 				container.setAttribute("waifu-clicked", "true");
+				container.style.outline = "0.3rem solid red";
 			} else {
 				selected.splice(selected.indexOf(data), 1);
 				container.setAttribute("waifu-clicked", "false");
+				container.style.outline = "none";
 			}
 		});
 	} else {
@@ -94,9 +100,11 @@ const append = (url, type) => {
 			if (container.getAttribute("waifu-clicked") === "false") {
 				selected.push(data);
 				container.setAttribute("waifu-clicked", "true");
+				container.style.outline = "0.3rem solid red";
 			} else {
 				selected.splice(selected.indexOf(data), 1);
 				container.setAttribute("waifu-clicked", "false");
+				container.style.outline = "none";
 			}
 		});
 	}
@@ -105,6 +113,11 @@ const append = (url, type) => {
 };
 
 button.addEventListener("click", () => {
+	if (finished) {
+		alert("Captcha already finished");
+		return;
+	}
+
 	captchaBody.style.display == "none"
 		? (captchaBody.style.display = "flex")
 		: (captchaBody.style.display = "none");
@@ -169,6 +182,7 @@ submitButton.style.position = "absolute";
 submitButton.style.right = "0";
 submitButton.style.bottom = "0";
 submitButton.style.margin = "0.5rem";
+submitButton.style.cursor = "pointer";
 submitButton.textContent = "Submit";
 
 submitButton.addEventListener("click", () => {
@@ -186,7 +200,7 @@ submitButton.addEventListener("click", () => {
 		imageContainer.innerHTML = "";
 		selected = [];
 		correctImages = [];
-    return;
+		return;
 	}
 
 	for (let i = 1; i <= correctSelectedUrls.length; i++) {
@@ -195,6 +209,8 @@ submitButton.addEventListener("click", () => {
 
 	if (correctImages.length === 0) {
 		alert("Passed");
+    finished = true;
+    button.textContent = "\u2713";
 	} else {
 		alert("Wrong");
 	}
