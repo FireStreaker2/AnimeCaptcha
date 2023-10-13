@@ -3,6 +3,15 @@ class AnimeCaptcha {
 		this.finished = false;
 		this.selected = [];
 		this.correctImages = [];
+		this.indicators = [
+			"felix_argyle",
+			"hoshino_ruby",
+			"hoshino_ai",
+			"nishikigi_chisato",
+			"konjiki_no_yami",
+			"shirakami_fubuki",
+			"ookami_mio",
+		];
 
 		this.body = document.createElement("div");
 		this.body.style.backgroundColor = "#cacaca";
@@ -75,8 +84,6 @@ class AnimeCaptcha {
 				return;
 			}
 
-			this.indicators = ["felix_argyle", "hoshino_ruby", "hoshino_ai"];
-
 			this.primaryIndicator =
 				this.indicators[Math.floor(Math.random() * this.indicators.length)];
 			this.secondaryIndicator =
@@ -87,7 +94,7 @@ class AnimeCaptcha {
 					this.indicators[Math.floor(Math.random() * this.indicators.length)];
 			}
 
-			this.title = this.primaryIndicator.replace("_", " ");
+			this.title = this.primaryIndicator.replaceAll("_", " ");
 			this.titleText.textContent = `Click all images containing ${this.title}.`;
 
 			this.amount = Math.floor(Math.random() * 9);
@@ -236,7 +243,16 @@ class AnimeCaptcha {
 	}
 
 	attach(container) {
+		if (this.indicators.length < 2) {
+			console.error("[ERROR] Length of Indicators is less than 2");
+			return;
+		}
+
 		container.appendChild(this.body);
+	}
+
+	setIndicators(indicators) {
+		this.indicators = indicators;
 	}
 
 	isFinished() {
