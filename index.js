@@ -12,6 +12,7 @@ class AnimeCaptcha {
 			"shirakami_fubuki",
 			"ookami_mio",
 		];
+		this.validFormats = ["jpg", "jpeg", "png", "PNG", "webm", "gif", "GIF"];
 
 		this.body = document.createElement("div");
 		this.body.style.backgroundColor = "#cacaca";
@@ -105,11 +106,19 @@ class AnimeCaptcha {
 				)
 					.then((response) => response.json())
 					.then((data) => {
-						if (i === this.amount) {
-							this.exampleImage.src = data.URL;
+						const extension = data.URL.slice(
+							((data.URL.lastIndexOf(".") - 1) >>> 0) + 2
+						);
+
+						if (this.validFormats.includes(extension) === false) {
+							i--;
 						} else {
-							this.correctImages.push(data.URL);
-							this.append(data.URL, "correct");
+							if (i === this.amount) {
+								this.exampleImage.src = data.URL;
+							} else {
+								this.correctImages.push(data.URL);
+								this.append(data.URL, "correct");
+							}
 						}
 					})
 					.catch((error) => {
@@ -124,7 +133,15 @@ class AnimeCaptcha {
 				)
 					.then((response) => response.json())
 					.then((data) => {
-						this.append(data.URL, "incorrect");
+						const extension = data.URL.slice(
+							((data.URL.lastIndexOf(".") - 1) >>> 0) + 2
+						);
+
+						if (!this.validFormats.includes(extension)) {
+							i--;
+						} else {
+							this.append(data.URL, "incorrect");
+						}
 					})
 					.catch((error) => {
 						this.captchaBody.style.display = "none";
