@@ -1,6 +1,7 @@
 class AnimeCaptcha {
 	constructor() {
 		this.finished = false;
+		this.selectedIndicators = [];
 		this.selected = [];
 		this.correctImages = [];
 		this.indicators = [
@@ -35,7 +36,6 @@ class AnimeCaptcha {
 		this.captchaBody = document.createElement("div");
 		this.captchaBody.style.display = "none";
 		this.captchaBody.style.width = "20rem";
-		this.captchaBody.style.height = "30rem";
 		this.captchaBody.style.position = "absolute";
 		this.captchaBody.style.backgroundColor = "#909090";
 		this.captchaBody.style.marginLeft = "11rem";
@@ -80,25 +80,22 @@ class AnimeCaptcha {
 				: (this.captchaBody.style.display = "none");
 
 			if (this.captchaBody.style.display == "none") {
+				this.captchaBody.style.display = "none";
 				this.imageContainer.innerHTML = "";
 				this.selected = [];
+				this.correctImages = [];
+				this.selectedIndicators = [];
 				return;
 			}
 
 			this.primaryIndicator =
 				this.indicators[Math.floor(Math.random() * this.indicators.length)];
-			this.secondaryIndicator =
-				this.indicators[Math.floor(Math.random() * this.indicators.length)];
-
-			while (this.secondaryIndicator == this.primaryIndicator) {
-				this.secondaryIndicator =
-					this.indicators[Math.floor(Math.random() * this.indicators.length)];
-			}
+			this.selectedIndicators.push(this.primaryIndicator);
 
 			this.title = this.primaryIndicator.replaceAll("_", " ");
 			this.titleText.textContent = `Click all images containing ${this.title}.`;
 
-			this.amount = Math.floor(Math.random() * 9);
+			this.amount = Math.floor(Math.random() * 6);
 
 			for (let i = 0; i < this.amount + 1; i++) {
 				fetch(
@@ -127,36 +124,57 @@ class AnimeCaptcha {
 					});
 			}
 
-			for (let i = 0; i < 9 - this.amount; i++) {
-				fetch(
-					`https://femboyfinder.firestreaker2.gq/api/${this.secondaryIndicator}`
-				)
-					.then((response) => response.json())
-					.then((data) => {
-						const extension = data.URL.slice(
-							((data.URL.lastIndexOf(".") - 1) >>> 0) + 2
-						);
+			this.amountRemaining = 9 - this.amount;
+			this.numberOfOtherIndicators =
+				Math.floor(Math.random() * this.amountRemaining) + 1;
 
-						if (!this.validFormats.includes(extension)) {
-							i--;
-						} else {
-							this.append(data.URL, "incorrect");
-						}
-					})
-					.catch((error) => {
-						this.captchaBody.style.display = "none";
-						console.error(`[ERROR] ${error}`);
-					});
+			for (let i = 0; i < this.numberOfOtherIndicators; i++) {
+				if (this.amountRemaining <= 0) {
+					break;
+				}
+
+				this.incorrectAmount =
+					Math.floor(Math.random() * this.amountRemaining) + 1;
+
+				this.currentIndicator =
+					this.indicators[Math.floor(Math.random() * this.indicators.length)];
+
+				while (this.selectedIndicators.includes(this.currentIndicator)) {
+					this.currentIndicator =
+						this.indicators[Math.floor(Math.random() * this.indicators.length)];
+				}
+
+				this.selectedIndicators.push(this.currentIndicator);
+
+				for (let j = 0; j < this.incorrectAmount; j++) {
+					fetch(
+						`https://femboyfinder.firestreaker2.gq/api/${this.currentIndicator}`
+					)
+						.then((response) => response.json())
+						.then((data) => {
+							const extension = data.URL.slice(
+								((data.URL.lastIndexOf(".") - 1) >>> 0) + 2
+							);
+
+							!this.validFormats.includes(extension)
+								? j--
+								: this.append(data.URL, "incorrect");
+						})
+						.catch((error) => {
+							this.captchaBody.style.display = "none";
+							console.error(`[ERROR] ${error}`);
+						});
+				}
+
+				this.amountRemaining -= this.incorrectAmount;
 			}
 		});
 
 		this.submitButton = document.createElement("button");
 		this.submitButton.style.width = "6rem";
 		this.submitButton.style.height = "2rem";
-		this.submitButton.style.position = "absolute";
-		this.submitButton.style.right = "0";
-		this.submitButton.style.bottom = "0";
 		this.submitButton.style.margin = "0.5rem";
+		this.submitButton.style.marginLeft = "auto";
 		this.submitButton.style.cursor = "pointer";
 		this.submitButton.textContent = "Submit";
 
@@ -197,6 +215,7 @@ class AnimeCaptcha {
 			this.imageContainer.innerHTML = "";
 			this.selected = [];
 			this.correctImages = [];
+			this.selectedIndicators = [];
 		});
 
 		this.titleContainer.appendChild(this.titleText);
@@ -260,12 +279,9 @@ class AnimeCaptcha {
 	}
 
 	attach(container) {
-		if (this.indicators.length < 2) {
-			console.error("[ERROR] Length of Indicators is less than 2");
-			return;
-		}
-
-		container.appendChild(this.body);
+		this.indicators.length < 2
+			? console.error("[ERROR] Length of Indicators is less than 2")
+			: container.appendChild(this.body);
 	}
 
 	setIndicators(indicators) {
