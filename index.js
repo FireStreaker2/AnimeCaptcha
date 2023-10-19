@@ -283,12 +283,4 @@ class AnimeCaptcha {
 			? console.error("[ERROR] Length of Indicators is less than 2")
 			: container.appendChild(this.body);
 	}
-
-	setIndicators(indicators) {
-		this.indicators = indicators;
-	}
-
-	isFinished() {
-		return this.finished;
-	}
 }
