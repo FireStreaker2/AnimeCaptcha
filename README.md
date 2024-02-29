@@ -26,17 +26,17 @@ captcha.attach(document.getElementById("anime-captcha"));
 
 ## Example
 ```html
-<script src="https://cdn.jsdelivr.net/gh/FireStreaker2/AnimeCaptcha@latest/index.min.js">
+<script>
   // initialize captcha
   const captcha = new AnimeCaptcha();
 
   // set specific indicators
-  captcha.setIndicators[
+  captcha.setIndicators([
     "hoshino_ai",
     "hoshino_ruby",
     "kurokawa_akane",
     "memcho",
-  ];
+  ]);
 
   // attach to element
   captcha.attach(document.getElementById("anime-captcha"));
