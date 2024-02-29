@@ -7,7 +7,7 @@ AnimeCaptcha was designed to be a simple captcha system, just using anime waifus
 ## Setup
 To get started, include this script link in your ``<body>`` tag.
 ```html
-<script src="https://cdn.jsdelivr.net/gh/FireStreaker2/AnimeCaptcha@latest/animecaptcha.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/FireStreaker2/AnimeCaptcha@latest/index.min.js"></script>
 ```
 
 After, make sure to initialize it and attach it to an element.
@@ -26,12 +26,12 @@ captcha.attach(document.getElementById("anime-captcha"));
 
 ## Example
 ```html
-<script src="https://cdn.jsdelivr.net/gh/FireStreaker2/AnimeCaptcha@latest/animecaptcha.min.js">
+<script src="https://cdn.jsdelivr.net/gh/FireStreaker2/AnimeCaptcha@latest/index.min.js">
   // initialize captcha
   const captcha = new AnimeCaptcha();
 
   // set specific indicators
-  captcha.indicators = [
+  captcha.setIndicators[
     "hoshino_ai",
     "hoshino_ruby",
     "kurokawa_akane",
@@ -42,11 +42,10 @@ captcha.attach(document.getElementById("anime-captcha"));
   captcha.attach(document.getElementById("anime-captcha"));
 
   // submit logic
-  const form = document.getElementById("form");
-  form.addEventListener("submit", (event) => {
+   document.getElementById("form").addEventListener("submit", (event) => {
     event.preventDefault();
 
-    captcha.finished === true
+    captcha.isFinished()
       ? alert(input.value.trim())
       : alert("Please finish the captcha");
   });

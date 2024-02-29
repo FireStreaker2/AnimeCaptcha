@@ -1,10 +1,17 @@
 class AnimeCaptcha {
+	#finished;
+	#selectedIndicators;
+	#selected;
+	#correctImages;
+	#indicators;
+	#validFormats;
+
 	constructor() {
-		this.finished = false;
-		this.selectedIndicators = [];
-		this.selected = [];
-		this.correctImages = [];
-		this.indicators = [
+		this.#finished = false;
+		this.#selectedIndicators = [];
+		this.#selected = [];
+		this.#correctImages = [];
+		this.#indicators = [
 			"felix_argyle",
 			"hoshino_ruby",
 			"hoshino_ai",
@@ -13,7 +20,7 @@ class AnimeCaptcha {
 			"shirakami_fubuki",
 			"ookami_mio",
 		];
-		this.validFormats = ["jpg", "jpeg", "png", "PNG", "webm", "gif", "GIF"];
+		this.#validFormats = ["jpg", "jpeg", "png", "PNG", "webm", "gif", "GIF"];
 
 		this.body = document.createElement("div");
 		this.body.style.backgroundColor = "#cacaca";
@@ -70,7 +77,7 @@ class AnimeCaptcha {
 		this.button.style.cursor = "pointer";
 
 		this.button.addEventListener("click", () => {
-			if (this.finished) {
+			if (this.#finished) {
 				alert("Captcha already finished");
 				return;
 			}
@@ -82,15 +89,15 @@ class AnimeCaptcha {
 			if (this.captchaBody.style.display == "none") {
 				this.captchaBody.style.display = "none";
 				this.imageContainer.innerHTML = "";
-				this.selected = [];
-				this.correctImages = [];
-				this.selectedIndicators = [];
+				this.#selected = [];
+				this.#correctImages = [];
+				this.#selectedIndicators = [];
 				return;
 			}
 
 			this.primaryIndicator =
-				this.indicators[Math.floor(Math.random() * this.indicators.length)];
-			this.selectedIndicators.push(this.primaryIndicator);
+				this.#indicators[Math.floor(Math.random() * this.#indicators.length)];
+			this.#selectedIndicators.push(this.primaryIndicator);
 
 			this.title = this.primaryIndicator.replaceAll("_", " ");
 			this.titleText.textContent = `Click all images containing ${this.title}.`;
@@ -107,19 +114,22 @@ class AnimeCaptcha {
 							((data.URL.lastIndexOf(".") - 1) >>> 0) + 2
 						);
 
-						if (this.validFormats.includes(extension) === false) {
+						if (this.#validFormats.includes(extension) === false) {
 							i--;
 						} else {
 							if (i === this.amount) {
 								this.exampleImage.src = data.URL;
 							} else {
-								this.correctImages.push(data.URL);
+								this.#correctImages.push(data.URL);
 								this.append(data.URL, "correct");
 							}
 						}
 					})
 					.catch((error) => {
 						this.captchaBody.style.display = "none";
+						this.#selected = [];
+						this.#correctImages = [];
+						this.#selectedIndicators = [];
 						console.error(`[ERROR] ${error}`);
 					});
 			}
@@ -137,31 +147,35 @@ class AnimeCaptcha {
 					Math.floor(Math.random() * this.amountRemaining) + 1;
 
 				this.currentIndicator =
-					this.indicators[Math.floor(Math.random() * this.indicators.length)];
+					this.#indicators[Math.floor(Math.random() * this.#indicators.length)];
 
-				while (this.selectedIndicators.includes(this.currentIndicator)) {
+				while (this.#selectedIndicators.includes(this.currentIndicator)) {
 					this.currentIndicator =
-						this.indicators[Math.floor(Math.random() * this.indicators.length)];
+						this.#indicators[
+							Math.floor(Math.random() * this.#indicators.length)
+						];
 				}
 
-				this.selectedIndicators.push(this.currentIndicator);
-
+				this.#selectedIndicators.push(this.currentIndicator);
 				for (let j = 0; j < this.incorrectAmount; j++) {
 					fetch(
 						`https://femboyfinder.firestreaker2.gq/api/${this.currentIndicator}`
 					)
 						.then((response) => response.json())
 						.then((data) => {
-							const extension = data.URL.slice(
+							const extension = data?.URL?.slice(
 								((data.URL.lastIndexOf(".") - 1) >>> 0) + 2
 							);
 
-							!this.validFormats.includes(extension)
+							!this.#validFormats.includes(extension)
 								? j--
 								: this.append(data.URL, "incorrect");
 						})
 						.catch((error) => {
 							this.captchaBody.style.display = "none";
+							this.#selected = [];
+							this.#correctImages = [];
+							this.#selectedIndicators = [];
 							console.error(`[ERROR] ${error}`);
 						});
 				}
@@ -179,11 +193,11 @@ class AnimeCaptcha {
 		this.submitButton.textContent = "Submit";
 
 		this.submitButton.addEventListener("click", () => {
-			this.correctSelectedUrls = this.selected
+			this.correctSelectedUrls = this.#selected
 				.filter((item) => item.type === "correct")
 				.map((item) => item.image);
 
-			this.incorrectSelectedUrls = this.selected
+			this.incorrectSelectedUrls = this.#selected
 				.filter((item) => item.type === "incorrect")
 				.map((item) => item.image);
 
@@ -191,21 +205,21 @@ class AnimeCaptcha {
 				alert("Wrong");
 				this.captchaBody.style.display = "none";
 				this.imageContainer.innerHTML = "";
-				this.selected = [];
-				this.correctImages = [];
+				this.#selected = [];
+				this.#correctImages = [];
 				return;
 			}
 
 			for (let i = 1; i <= this.correctSelectedUrls.length; i++) {
-				this.correctImages.splice(
-					this.correctImages.indexOf(this.correctSelectedUrls[i]),
+				this.#correctImages.splice(
+					this.#correctImages.indexOf(this.correctSelectedUrls[i]),
 					1
 				);
 			}
 
-			if (this.correctImages.length === 0) {
+			if (this.#correctImages.length === 0) {
 				alert("Passed");
-				this.finished = true;
+				this.#finished = true;
 				this.button.textContent = "\u2713";
 			} else {
 				alert("Wrong");
@@ -213,9 +227,9 @@ class AnimeCaptcha {
 
 			this.captchaBody.style.display = "none";
 			this.imageContainer.innerHTML = "";
-			this.selected = [];
-			this.correctImages = [];
-			this.selectedIndicators = [];
+			this.#selected = [];
+			this.#correctImages = [];
+			this.#selectedIndicators = [];
 		});
 
 		this.titleContainer.appendChild(this.titleText);
@@ -250,11 +264,11 @@ class AnimeCaptcha {
 				const data = { image: url, type: "correct" };
 
 				if (container.getAttribute("waifu-clicked") === "false") {
-					this.selected.push(data);
+					this.#selected.push(data);
 					container.setAttribute("waifu-clicked", "true");
 					container.style.outline = "0.3rem solid red";
 				} else {
-					this.selected.splice(this.selected.indexOf(data), 1);
+					this.#selected.splice(this.#selected.indexOf(data), 1);
 					container.setAttribute("waifu-clicked", "false");
 					container.style.outline = "none";
 				}
@@ -264,11 +278,11 @@ class AnimeCaptcha {
 				const data = { image: url, type: "incorrect" };
 
 				if (container.getAttribute("waifu-clicked") === "false") {
-					this.selected.push(data);
+					this.#selected.push(data);
 					container.setAttribute("waifu-clicked", "true");
 					container.style.outline = "0.3rem solid red";
 				} else {
-					this.selected.splice(this.selected.indexOf(data), 1);
+					this.#selected.splice(this.#selected.indexOf(data), 1);
 					container.setAttribute("waifu-clicked", "false");
 					container.style.outline = "none";
 				}
@@ -279,8 +293,16 @@ class AnimeCaptcha {
 	}
 
 	attach(container) {
-		this.indicators.length < 2
+		this.#indicators.length < 2
 			? console.error("[ERROR] Length of Indicators is less than 2")
 			: container.appendChild(this.body);
+	}
+
+	isFinished() {
+		return this.#finished;
+	}
+
+	setIndicators(indicators) {
+		this.#indicators = indicators;
 	}
 }
